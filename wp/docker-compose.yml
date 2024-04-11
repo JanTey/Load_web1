@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  # Database
+  db:
+    image: mariadb:10.6.4-focal
+    #image: mysql:5.7
+    platform: linux/x86_64
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=wppassword
+      - MYSQL_DATABASE=wpdb
+      - MYSQL_USER=wpuser
+      - MYSQL_PASSWORD=wppassword
+    expose:
+      - 3306
+      - 33060
+    #networks:
+    #  - wpsite
+
+  # Wordpress
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    volumes:
+      - wpdata:/var/www/html  # Используем wp_data вместо wpdata
+    ports:
+      - '80:80'
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    #networks:
+    #  - wpsite
+
+#networks:
+#  wpsite:
+
+volumes:
+  db_data:
+  wpdata:
